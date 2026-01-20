@@ -32,7 +32,6 @@ export class HttpCacheInterceptor extends CacheInterceptor {
       .join('&');
 
     const key = `customers:${path}${queryString ? ':' + queryString : ''}`;
-    console.log('🚀 - key:', key);
     this.appCache.track(key);
     return key;
   }
