@@ -8,10 +8,17 @@ import { Customer } from './entities/customer.entity';
 export class CustomerController {
   constructor(private readonly customerService: CustomerService) {}
 
+  // TODO: Need to be cached
   @Get()
   async findAll(
     @Query() queryDto: QueryCustomerDto,
   ): Promise<PaginatedResponse<Customer>> {
     return this.customerService.findAll(queryDto);
+  }
+
+  // TODO: Need to be cached
+  @Get(':id')
+  async findOne(@Query('id') id: string): Promise<Customer | null> {
+    return this.customerService.findOne(id);
   }
 }

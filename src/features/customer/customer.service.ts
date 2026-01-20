@@ -29,6 +29,13 @@ export class CustomerService {
     const skip = (page - 1) * limit;
 
     const queryBuilder = this.customerRepository.createQueryBuilder('customer');
+    // I saw in the test file that customer/:id will return more details about the customer, so I select only necessary fields here
+    queryBuilder.select([
+      'customer.id',
+      'customer.fullName',
+      'customer.email',
+      'customer.createdAt',
+    ]);
 
     if (search)
       queryBuilder.andWhere('customer.fullName ILIKE :search', {
@@ -74,5 +81,9 @@ export class CustomerService {
         totalPages,
       },
     };
+  }
+
+  async findOne(id: string): Promise<Customer | null> {
+    return this.customerRepository.findOneBy({ id });
   }
 }
