@@ -7,6 +7,7 @@ import { PaginatedResponse } from '../../common/dto/pagination.dto';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { AppCacheService } from '../../common/global-modules/app-cache/app-cache.service';
+import { CustomerGateway } from './customer.gateway';
 
 @Injectable()
 export class CustomerService {
@@ -14,6 +15,7 @@ export class CustomerService {
     @InjectRepository(Customer)
     private readonly customerRepository: Repository<Customer>,
     private readonly appCache: AppCacheService,
+    private readonly customerGateway: CustomerGateway,
   ) {}
 
   async create(createCustomerDto: CreateCustomerDto): Promise<PublicCustomer> {
@@ -24,6 +26,7 @@ export class CustomerService {
     const savedCustomer = await this.customerRepository.save(customer);
 
     await this.appCache.invalidateByPrefix('customers:/customers:');
+    this.customerGateway.emitCustomerCreated('customer.created');
 
     return this.toPublicDto(savedCustomer);
   }
@@ -134,6 +137,7 @@ export class CustomerService {
     await this.appCache.invalidateByPrefix('customers:/customers:');
     await this.appCache.invalidateByPrefix(`customers:/customers/${id}`);
 
+    this.customerGateway.emitCustomerCreated('customer.updated');
     return this.toPublicDto(savedCustomer);
   }
 

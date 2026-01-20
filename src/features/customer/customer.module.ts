@@ -4,10 +4,11 @@ import { CustomerService } from './customer.service';
 import { CustomerController } from './customer.controller';
 import { InternalCustomerController } from './internal-customer.controller';
 import { Customer } from './entities/customer.entity';
+import { CustomerGateway } from './customer.gateway';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Customer])],
   controllers: [CustomerController, InternalCustomerController],
-  providers: [CustomerService],
+  providers: [CustomerService, CustomerGateway],
 })
 export class CustomerModule {}
