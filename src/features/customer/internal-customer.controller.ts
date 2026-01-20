@@ -1,7 +1,7 @@
 import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { CustomerService } from './customer.service';
 import { Customer } from './entities/customer.entity';
-import { InternalEndpointGuard } from '../../guards/internal-endpoint.guard';
+import { InternalEndpointGuard } from '../../common/guards/internal-endpoint.guard';
 
 @Controller('internal/customers')
 @UseGuards(InternalEndpointGuard)
