@@ -4,8 +4,8 @@ import { Repository } from 'typeorm';
 import { Customer, PublicCustomer } from './entities/customer.entity';
 import { CustomerSortField, QueryCustomerDto } from './dto/query-customer.dto';
 import { PaginatedResponse } from '../../common/dto/pagination.dto';
-import { SortOrder } from '../../common/dto/sorting.dto';
 import { CreateCustomerDto } from './dto/create-customer.dto';
+import { UpdateCustomerDto } from './dto/update-customer.dto';
 
 @Injectable()
 export class CustomerService {
@@ -32,8 +32,8 @@ export class CustomerService {
       search,
       dateFrom,
       dateTo,
-      sortBy = CustomerSortField.CREATED_AT,
-      sortOrder = SortOrder.DESC,
+      sortBy,
+      sortOrder,
     } = queryDto;
 
     const skip = (page - 1) * limit;
@@ -74,7 +74,7 @@ export class CustomerService {
         ? 'customer.fullName'
         : 'customer.createdAt';
 
-    queryBuilder.orderBy(sortField, sortOrder);
+    queryBuilder.orderBy(sortField, sortOrder ?? 'ASC');
 
     queryBuilder.skip(skip).take(limit);
 
@@ -111,6 +111,23 @@ export class CustomerService {
         updatedAt: true,
       },
     });
+  }
+
+  async update(
+    id: string,
+    updateCustomerDto: UpdateCustomerDto,
+  ): Promise<PublicCustomer> {
+    const customer = await this.customerRepository.findOneBy({ id });
+
+    if (!customer) throw new Error('customer_not_found');
+
+    const updatedCustomer = this.customerRepository.merge(
+      customer,
+      updateCustomerDto,
+    );
+    const savedCustomer = await this.customerRepository.save(updatedCustomer);
+
+    return this.toPublicDto(savedCustomer);
   }
 
   /* ---------------------------------- Tools --------------------------------- */
