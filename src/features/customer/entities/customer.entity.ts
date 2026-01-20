@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   Index,
+  Unique,
 } from 'typeorm';
 
 export type PublicCustomer = Omit<Customer, 'nationalId' | 'internalNotes'>;
@@ -28,6 +29,7 @@ export class Customer {
 
   // We are not selecting these sensitive fields by default as requested in the file
   @Column({ type: 'varchar', length: 100, select: false, name: 'national_id' })
+  @Unique('UQ_customers_national_id', ['nationalId'])
   nationalId: string;
 
   // We are not selecting these sensitive fields by default as requested in the file

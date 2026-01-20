@@ -5,6 +5,7 @@ import { Customer, PublicCustomer } from './entities/customer.entity';
 import { CustomerSortField, QueryCustomerDto } from './dto/query-customer.dto';
 import { PaginatedResponse } from '../../common/dto/pagination.dto';
 import { SortOrder } from '../../common/dto/sorting.dto';
+import { CreateCustomerDto } from './dto/create-customer.dto';
 
 @Injectable()
 export class CustomerService {
@@ -13,6 +14,15 @@ export class CustomerService {
     private readonly customerRepository: Repository<Customer>,
   ) {}
 
+  async create(createCustomerDto: CreateCustomerDto): Promise<PublicCustomer> {
+    const customer = this.customerRepository.create({
+      ...createCustomerDto,
+    });
+
+    const savedCustomer = await this.customerRepository.save(customer);
+
+    return this.toPublicDto(savedCustomer);
+  }
   async findAll(
     queryDto: QueryCustomerDto,
   ): Promise<PaginatedResponse<PublicCustomer>> {
@@ -101,5 +111,17 @@ export class CustomerService {
         updatedAt: true,
       },
     });
+  }
+
+  /* ---------------------------------- Tools --------------------------------- */
+  private toPublicDto(customer: Customer): PublicCustomer {
+    return {
+      id: customer.id,
+      fullName: customer.fullName,
+      email: customer.email,
+      phoneNumber: customer.phoneNumber,
+      createdAt: customer.createdAt,
+      updatedAt: customer.updatedAt,
+    };
   }
 }
