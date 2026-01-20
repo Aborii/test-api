@@ -15,12 +15,12 @@ import { PaginatedResponse } from '../../common/dto/pagination.dto';
 import { PublicCustomer } from './entities/customer.entity';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
+import { UseHttpCacheInterceptor } from '../../common/decorators/use-http-cache-interceptor.decorator';
 
 @Controller('customers')
 export class CustomerController {
   constructor(private readonly customerService: CustomerService) {}
 
-  // TODO: Need to revalidate cache of findAll
   // TODO: Send socket event customer.created
   // TODO: Ask what does this mean "Do not blindly accept sensitive fields"
   @Post()
@@ -30,7 +30,7 @@ export class CustomerController {
     return this.customerService.create(createCustomerDto);
   }
 
-  // TODO: Need to be cached
+  @UseHttpCacheInterceptor()
   @Get()
   async findAll(
     @Query() queryDto: QueryCustomerDto,
@@ -38,13 +38,12 @@ export class CustomerController {
     return this.customerService.findAll(queryDto);
   }
 
-  // TODO: Need to be cached
+  @UseHttpCacheInterceptor()
   @Get(':id')
-  async findOne(@Query('id') id: string): Promise<PublicCustomer | null> {
+  async findOne(@Param('id') id: string): Promise<PublicCustomer | null> {
     return this.customerService.findOne(id);
   }
 
-  // TODO: Need to revalidate cache of findAll, findById
   // TODO: Send socket event customer.updated
   @Patch(':id')
   async update(

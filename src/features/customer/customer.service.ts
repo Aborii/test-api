@@ -6,12 +6,14 @@ import { CustomerSortField, QueryCustomerDto } from './dto/query-customer.dto';
 import { PaginatedResponse } from '../../common/dto/pagination.dto';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
+import { AppCacheService } from '../../common/global-modules/app-cache/app-cache.service';
 
 @Injectable()
 export class CustomerService {
   constructor(
     @InjectRepository(Customer)
     private readonly customerRepository: Repository<Customer>,
+    private readonly appCache: AppCacheService,
   ) {}
 
   async create(createCustomerDto: CreateCustomerDto): Promise<PublicCustomer> {
@@ -20,6 +22,8 @@ export class CustomerService {
     });
 
     const savedCustomer = await this.customerRepository.save(customer);
+
+    await this.appCache.invalidateByPrefix('customers:/customers:');
 
     return this.toPublicDto(savedCustomer);
   }
@@ -126,6 +130,9 @@ export class CustomerService {
       updateCustomerDto,
     );
     const savedCustomer = await this.customerRepository.save(updatedCustomer);
+
+    await this.appCache.invalidateByPrefix('customers:/customers:');
+    await this.appCache.invalidateByPrefix(`customers:/customers/${id}`);
 
     return this.toPublicDto(savedCustomer);
   }
