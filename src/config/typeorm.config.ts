@@ -13,7 +13,4 @@ export const getTypeOrmConfig = (
   port: configService.get<number>('DATABASE_PORT'),
   host: configService.get<string>('DATABASE_HOST'),
   logging: process.env.LOGGING === 'true',
-  entities: ['**/*.entity.js'],
-  migrations: ['**/migrations/*.js'],
-  migrationsTransactionMode: 'each',
 });
