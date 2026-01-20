@@ -1,13 +1,21 @@
-import { CacheInterceptor } from '@nestjs/cache-manager';
-import { ExecutionContext } from '@nestjs/common';
-import { Injectable } from '@nestjs/common';
+import { Cache, CACHE_MANAGER, CacheInterceptor } from '@nestjs/cache-manager';
+import { ExecutionContext, Inject, Injectable } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
+import { AppCacheService } from '../global-modules/app-cache/app-cache.service';
 
 @Injectable()
 export class HttpCacheInterceptor extends CacheInterceptor {
+  constructor(
+    @Inject(CACHE_MANAGER) private readonly cacheManger: Cache,
+    reflector: Reflector,
+    private readonly appCache: AppCacheService,
+  ) {
+    super(cacheManger, reflector);
+  }
   trackBy(context: ExecutionContext): string | undefined {
     const request = context.switchToHttp().getRequest<Request>();
-    const { url, query } = request;
+    const { path, query } = request;
 
     const queryString = Object.keys(query)
       .sort()
@@ -22,7 +30,10 @@ export class HttpCacheInterceptor extends CacheInterceptor {
         }
       })
       .join('&');
-    console.log(`customers:${url}${queryString ? '?' + queryString : ''}`);
-    return `customers:${url}${queryString ? '?' + queryString : ''}`;
+
+    const key = `customers:${path}${queryString ? ':' + queryString : ''}`;
+    console.log('🚀 - key:', key);
+    this.appCache.track(key);
+    return key;
   }
 }
