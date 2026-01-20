@@ -7,6 +7,8 @@ import {
   Index,
 } from 'typeorm';
 
+export type PublicCustomer = Omit<Customer, 'nationalId' | 'internalNotes'>;
+
 @Entity('customers')
 @Index('IDX_customers_created_at', ['createdAt'])
 @Index('IDX_customers_email', ['email'])
@@ -24,9 +26,11 @@ export class Customer {
   @Column({ type: 'varchar', length: 50, name: 'phone_number' })
   phoneNumber: string;
 
+  // We are not selecting these sensitive fields by default as requested in the file
   @Column({ type: 'varchar', length: 100, select: false, name: 'national_id' })
   nationalId: string;
 
+  // We are not selecting these sensitive fields by default as requested in the file
   @Column({
     type: 'text',
     nullable: true,

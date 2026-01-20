@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Customer } from './entities/customer.entity';
+import { Customer, PublicCustomer } from './entities/customer.entity';
 import { CustomerSortField, QueryCustomerDto } from './dto/query-customer.dto';
 import { PaginatedResponse } from '../../common/dto/pagination.dto';
 import { SortOrder } from '../../common/dto/sorting.dto';
@@ -15,7 +15,7 @@ export class CustomerService {
 
   async findAll(
     queryDto: QueryCustomerDto,
-  ): Promise<PaginatedResponse<Customer>> {
+  ): Promise<PaginatedResponse<PublicCustomer>> {
     const {
       page = 1,
       limit = 10,
@@ -83,7 +83,23 @@ export class CustomerService {
     };
   }
 
-  async findOne(id: string): Promise<Customer | null> {
+  async findOne(id: string): Promise<PublicCustomer | null> {
     return this.customerRepository.findOneBy({ id });
+  }
+
+  async findOneInternal(id: string): Promise<Customer | null> {
+    return this.customerRepository.findOne({
+      where: { id },
+      select: {
+        id: true,
+        fullName: true,
+        email: true,
+        phoneNumber: true,
+        nationalId: true,
+        internalNotes: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
   }
 }
