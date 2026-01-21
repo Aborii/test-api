@@ -21,7 +21,6 @@ import { UseHttpCacheInterceptor } from '../../common/decorators/use-http-cache-
 export class CustomerController {
   constructor(private readonly customerService: CustomerService) {}
 
-  // TODO: Send socket event customer.created
   // TODO: Ask what does this mean "Do not blindly accept sensitive fields"
   @Post()
   async create(
@@ -44,7 +43,6 @@ export class CustomerController {
     return this.customerService.findOne(id);
   }
 
-  // TODO: Send socket event customer.updated
   @Patch(':id')
   async update(
     @Param('id') id: string,
